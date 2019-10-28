@@ -293,3 +293,53 @@ public class RestfulController {
 }
 ```
 这样与之前使用RequestMapping的效果完全相同，但是代码简化了很多
+
+## SpringMVC结果返回
+在使用servlet的时候，我们可以获取HttpServletRequest和HttpServletResponse进行转发与重定向，在SpringMVC中也有转发与重定向：
+### 使用HttpServletRequest和HttpServletResponse进行转发与重定向
+```java
+    //使用Servlet原生API进行转发&重定向
+    @RequestMapping("/m1/t1")
+    public void test(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        System.out.println(session.getId());
+        session.setAttribute("msg","helloooooooo");
+//        return("hello");
+        request.getRequestDispatcher("/WEB-INF/jsp/hello.jsp").forward(request,response);
+//        response.sendRedirect("/index.jsp");
+    }
+```
+这样就实现了在不使用视图解析器的情况下进行转发与重定向
+
+### 使用SpringMVC无视图解析器进行转发与重定向
+```java
+//SpringMVC不使用视图解析器时，默认调用原生ServletAPI进行转发与重定向
+//return ("forward:/xxx/xxx/")转发
+//return ("redirect:/XXX/XXX/")重定向
+@RequestMapping("/m1/t2")
+public String test1(Model model){
+    model.addAttribute("msg","helllllll");
+//    return("forward:/WEB-INF/jsp/hello.jsp");
+    return("redirect:/WEB-INF/jsp/hello.jsp");
+}
+```
+### 使用SpringMVC并且使用视图解析器时
+```java
+//SpringMVC使用视图解析器时
+//return ("xxx")转发
+//return ("redirect:/XXX.jsp")重定向
+@RequestMapping("/m1/t3")
+public String test2(Model model){
+    model.addAttribute("msg","xxxxxxxx");
+//        return("redirect:/index.jsp");
+    return("redirect:/m1/t4");
+}
+
+@RequestMapping("/m1/t4")
+public String test3(Model model){
+    model.addAttribute("msg","重定向页面");
+    return("hello");
+}
+```
+转发只要输入文件名就会自动加上前后缀，重定向则需要输入redirect:来辨别这是一个重定向（ps：重定向不会进行拼接，所以要使用绝对路径）
+
