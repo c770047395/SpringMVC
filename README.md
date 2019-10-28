@@ -376,3 +376,20 @@ public String test3(Model model){
 - Model：精简版的ModelMap，几乎都用这个
 - ModelMap：继承了LinkedHashMap，有LinkedHashMap的特性
 - ModelAndView：在继承Controller接口时使用，在储存数据的同时也将设置返回视图逻辑
+
+## 乱码问题解决
+在web.xml中配置过滤器即可，SpringMVC中自带了过滤器
+```xml
+<filter>
+    <filter-name>encoding</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+        <param-name>encoding</param-name>
+        <param-value>utf-8</param-value>
+    </init-param>
+</filter>
+<filter-mapping>
+    <filter-name>encoding</filter-name>
+    <url-pattern>/*</url-pattern>
+</filter-mapping>
+```
