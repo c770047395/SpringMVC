@@ -393,3 +393,135 @@ public String test3(Model model){
     <url-pattern>/*</url-pattern>
 </filter-mapping>
 ```
+
+## 使用Json
+
+### jackson的使用
+1. 引入jar包
+```xml
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.10.0</version>
+</dependency>
+```
+
+2. 解决中文乱码问题
+
+   - 在RequestMapping中加入produces参数
+```java
+@RequestMapping(value = "/j1", produces = "application/json;charset=utf-8")//解决乱码
+//    @ResponseBody //加了这个注解或者使用RestController就不会走视图解析器，会直接返回一个字符串
+public String json1() throws JsonProcessingException {
+
+    ObjectMapper mapper = new ObjectMapper();
+    User user = new User("陈鹏",3,"男");
+
+    String string = mapper.writeValueAsString(user);
+    return(string);
+}
+```
+   - 在springmvc配置文件中加入以下配置：
+```xml
+<mvc:annotation-driven>
+    <mvc:message-converters register-defaults="true">
+        <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+            <constructor-arg value="UTF-8"/>
+        </bean>
+        <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+            <property name="objectMapper">
+                <bean class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean">
+                    <property name="failOnEmptyBeans" value="false"/>
+                </bean>
+            </property>
+        </bean>
+    </mvc:message-converters>
+</mvc:annotation-driven>
+```
+
+3. 编写jackson工具类
+```java
+public class JsonUtil {
+
+    public static String getJson(Object object){
+        return getJson(object,"yyyy-MM-dd HH:mm:ss");
+    }
+    public static String getJson(Object object,String format){
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,false);
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
+        mapper.setDateFormat(sdf);
+        try {
+            return mapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+
+        }
+        return null;
+    }
+}
+```
+
+4. 将控制器注册为RestController或者在每个类上都加上@ResponseBody注解（ps：推荐第一种，因为使用RESTful之后前后端分离，返回的都是数据）
+```java
+@RestController
+//@Controller
+public class UserController {
+//    @RequestMapping(value = "/j1", produces = "application/json;charset=utf-8")//解决乱码
+    @RequestMapping("/j1")//在配置文件中的annotation-driven配置解决乱码
+//    @ResponseBody //加了这个注解或者使用RestController就不会走视图解析器，会直接返回一个字符串
+    public String json1() throws JsonProcessingException {
+
+        ObjectMapper mapper = new ObjectMapper();
+        User user = new User("陈鹏",3,"男");
+
+        String string = mapper.writeValueAsString(user);
+        return(string);
+    }
+    @RequestMapping("/j2")
+    public String json2() throws JsonProcessingException {
+
+        ObjectMapper mapper = new ObjectMapper();
+        List<User> userList = new ArrayList<User>();
+        User user1 = new User("陈鹏2",3,"男");
+        User user2 = new User("陈鹏3",3,"男");
+        User user3 = new User("陈鹏4",3,"男");
+        User user4 = new User("陈鹏5",3,"男");
+        userList.add(user1);
+        userList.add(user2);
+        userList.add(user3);
+        userList.add(user4);
+        String string = mapper.writeValueAsString(userList);
+        return(string);
+    }
+
+    @RequestMapping("/j3")
+    public String json3() throws JsonProcessingException {
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,false);
+        Date date = new Date();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        mapper.setDateFormat(sdf);
+
+//        String string = mapper.writeValueAsString(sdf.format(date));
+        String string = mapper.writeValueAsString(date);
+        return(string);
+    }
+
+    @RequestMapping("/j4")
+    public String json4()  {
+
+        User cp = new User("cpasp",1,"nan");
+        Date date = new Date();
+        return JsonUtil.getJson(date);
+
+    }
+
+
+
+}
+
+```
+其中， json1、2、3为没有使用工具类的，json4使用了工具类。
