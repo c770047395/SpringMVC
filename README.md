@@ -409,35 +409,35 @@ public String test3(Model model){
 2. 解决中文乱码问题
 
    - 在RequestMapping中加入produces参数
-```java
-@RequestMapping(value = "/j1", produces = "application/json;charset=utf-8")//解决乱码
-//    @ResponseBody //加了这个注解或者使用RestController就不会走视图解析器，会直接返回一个字符串
-public String json1() throws JsonProcessingException {
-
-    ObjectMapper mapper = new ObjectMapper();
-    User user = new User("陈鹏",3,"男");
-
-    String string = mapper.writeValueAsString(user);
-    return(string);
-}
-```
+    ```java
+    @RequestMapping(value = "/j1", produces = "application/json;charset=utf-8")//解决乱码
+    //    @ResponseBody //加了这个注解或者使用RestController就不会走视图解析器，会直接返回一个字符串
+    public String json1() throws JsonProcessingException {
+    
+        ObjectMapper mapper = new ObjectMapper();
+        User user = new User("陈鹏",3,"男");
+    
+        String string = mapper.writeValueAsString(user);
+        return(string);
+    }
+    ```
    - 在springmvc配置文件中加入以下配置：
-```xml
-<mvc:annotation-driven>
-    <mvc:message-converters register-defaults="true">
-        <bean class="org.springframework.http.converter.StringHttpMessageConverter">
-            <constructor-arg value="UTF-8"/>
-        </bean>
-        <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
-            <property name="objectMapper">
-                <bean class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean">
-                    <property name="failOnEmptyBeans" value="false"/>
-                </bean>
-            </property>
-        </bean>
-    </mvc:message-converters>
-</mvc:annotation-driven>
-```
+    ```xml
+    <mvc:annotation-driven>
+        <mvc:message-converters register-defaults="true">
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <constructor-arg value="UTF-8"/>
+            </bean>
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="objectMapper">
+                    <bean class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean">
+                        <property name="failOnEmptyBeans" value="false"/>
+                    </bean>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+    ```
 
 3. 编写jackson工具类
 ```java
@@ -525,3 +525,34 @@ public class UserController {
 
 ```
 其中， json1、2、3为没有使用工具类的，json4使用了工具类。
+
+### fastjson的使用
+fastjson相当于我们封装后的jackson，比较容易上手
+1. 引入jar包
+```xml
+<dependency>
+    <groupId>com.alibaba</groupId>
+    <artifactId>fastjson</artifactId>
+    <version>1.2.60</version>
+</dependency>
+```
+2. 直接就可以使用了
+```java
+@RequestMapping("/j5")
+public String json5()  {
+
+    List<User> userList = new ArrayList<User>();
+    User user1 = new User("陈鹏2",3,"男");
+    User user2 = new User("陈鹏3",3,"男");
+    User user3 = new User("陈鹏4",3,"男");
+    User user4 = new User("陈鹏5",3,"男");
+    userList.add(user1);
+    userList.add(user2);
+    userList.add(user3);
+    userList.add(user4);
+    String string = JSON.toJSONString(userList);
+    return string;
+}
+```
+注：
+- json转对象用JSON.parseObjct(json)

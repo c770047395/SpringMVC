@@ -1,5 +1,6 @@
 package com.cp.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.cp.pojo.User;
 import com.cp.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -68,6 +69,22 @@ public class UserController {
         Date date = new Date();
         return JsonUtil.getJson(date);
 
+    }
+
+    @RequestMapping("/j5")
+    public String json5()  {
+
+        List<User> userList = new ArrayList<User>();
+        User user1 = new User("陈鹏2",3,"男");
+        User user2 = new User("陈鹏3",3,"男");
+        User user3 = new User("陈鹏4",3,"男");
+        User user4 = new User("陈鹏5",3,"男");
+        userList.add(user1);
+        userList.add(user2);
+        userList.add(user3);
+        userList.add(user4);
+        String string = JSON.toJSONString(userList);
+        return string;
     }
 
 
