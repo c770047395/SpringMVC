@@ -231,4 +231,65 @@ public class HelloController {
    - 通过``return "hello"``指定我们要返回的view页面
    - 通过model参数实现值的传递，2、3两步相当于之前的ModelAndView返回给HandlerAdapter，拿给DispatcherServlet解析
    - 使用@RequestMapping("/hello")注解将方法与url绑定，当访问项目下的/hello时，HandlerMapping就能找到这个方法
-   
+
+
+## SpringMVC接收参数
+
+### 一般参数
+在参数以普通GET或者POST方式传来时，我们在方法上添加参数即可接收（注意方法中的参数名要与传递的参数名相同）
+例如：
+- 前端请求：http://localhost:8080/hello?a=1&b=2
+- Controller处理：
+```java
+@Controller
+public class RestfulController {
+    @RequestMapping("/add")
+    public String test1(int a,int b, Model model){
+        int res = a+b;
+        model.addAttribute("msg","结果为"+res);
+        return "hello";
+    }
+}
+```
+
+### RESTful风格
+- 前端请求：http://localhost:8080/hello/1/2
+- Controller处理：
+```java
+@Controller
+public class RestfulController {
+    @RequestMapping(value = "/add/{a}/{b}", method = RequestMethod.GET)
+    public String test1(@PathVariable int a,@PathVariable int b, Model model){
+        int res = a+b;
+        model.addAttribute("msg","结果为"+res);
+        return "hello";
+    }
+}
+```
+
+此时，这个Controller只能处理GET方式的请求。（ps：要在参数前面加@PathVariable代表是路径参数，可以将url与参数对应）
+常见的RESTful请求类型有：
+- GET：用于查询
+- POST：用于新增
+- PUT：用于更新
+- DELETE：用于删除
+对应的RequestMapping有：
+- @GetMapping
+- @PostMapping
+- @PutMapping
+- @DeleteMapping
+
+此时我们可以这样加注解：
+```java
+@Controller
+public class RestfulController {
+//    @RequestMapping(value = "/add/{a}/{b}", method = RequestMethod.GET)
+    @GetMapping("/add/{a}/{b}")    
+    public String test1(@PathVariable int a,@PathVariable int b, Model model){
+        int res = a+b;
+        model.addAttribute("msg","结果为"+res);
+        return "hello";
+    }
+}
+```
+这样与之前使用RequestMapping的效果完全相同，但是代码简化了很多
