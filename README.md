@@ -252,6 +252,35 @@ public class RestfulController {
 }
 ```
 
+如果方法中的名字与前端传来的参数名不相同，我们可以通过@RequestParam注解标记
+```java
+//前端参数与接收参数不同，使用@RequestParam("xx")注解  ps：最好前端接收的参数都使用
+//localhost：8080/user/t1?username=xxxx
+@GetMapping("t2")
+public String test1(@RequestParam("username") String name, Model model){
+    //1.接收前端参数
+    System.out.println("get param:"+name);
+    //2.将返回的结果传递给前端
+    model.addAttribute("msg",name);
+
+    return "hello";
+}
+```
+
+如果前端传递的是一个对象表单（例如这里使用的是user表单，则可以直接用这个对象当作方法的入参）
+```java
+//前端接受的参数是一个对象
+@RequestMapping("/t3")
+public String test2(User user, Model model){
+    //1.接收前端参数
+    System.out.println(user);
+    //2.将返回的结果传递给前端
+    model.addAttribute("msg",user);
+    return "hello";
+}
+```
+
+
 ### RESTful风格
 - 前端请求：http://localhost:8080/hello/1/2
 - Controller处理：
@@ -343,3 +372,7 @@ public String test3(Model model){
 ```
 转发只要输入文件名就会自动加上前后缀，重定向则需要输入redirect:来辨别这是一个重定向（ps：重定向不会进行拼接，所以要使用绝对路径）
 
+返回的结果我们一般封装在Model中，与Model类似的还有ModelAndView以及ModelMap
+- Model：精简版的ModelMap，几乎都用这个
+- ModelMap：继承了LinkedHashMap，有LinkedHashMap的特性
+- ModelAndView：在继承Controller接口时使用，在储存数据的同时也将设置返回视图逻辑
