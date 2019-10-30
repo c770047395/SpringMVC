@@ -556,3 +556,48 @@ public String json5()  {
 ```
 注：
 - json转对象用JSON.parseObjct(json)
+
+## 拦截器
+SpringMVC中提供了拦截器接口，继承HandlerInterceptor接口即可配置一个拦截器
+HandlerInterceptor提供了三个方法：
+- preHandler ：在拦截方法前执行，通过返回值判断是否执行下一步，返回值为true则继续执行，返回值为false则拦截
+- postHandler ： 在拦截方法后执行（一般用于日志）
+- afterCompletion ： 渲染后处理（一般用于日志）
+拦截器通过AOP的思想实现横切拦截请求
+!()[https://img-blog.csdnimg.cn/20190701162842270.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMzIzMjU2,size_16,color_FFFFFF,t_70]
+
+**例子**
+
+```java
+public class MyInterceptor implements HandlerInterceptor {
+    // return true 执行下一个拦截器，放行
+    // return false 不执行下一个拦截器
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        System.out.println("处理前====================");
+        return true;
+    }
+
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+        System.out.println("处理后====================");
+
+    }
+
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        System.out.println("清理====================");
+
+    }
+}
+```
+```xml
+<mvc:interceptors>
+    <mvc:interceptor>
+        <mvc:mapping path="/**"/>
+        <bean class="com.cp.config.MyInterceptor"/>
+    </mvc:interceptor>
+</mvc:interceptors>
+```
+这样会将所有的请求都拦截，如果想拦截特定的请求
+```xml
+<mvc:mapping path="/main/**"/>
+```
+即可拦截有/main的所有请求
