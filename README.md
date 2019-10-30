@@ -601,3 +601,81 @@ public class MyInterceptor implements HandlerInterceptor {
 <mvc:mapping path="/main/**"/>
 ```
 即可拦截有/main的所有请求
+
+## 文件上传
+
+1. 编写jsp页面
+```jsp
+  <form action="/upload" enctype="multipart/form-data" method="post">
+    <input type="file" name="file">
+    <input type="submit" value="upload">
+  </form>
+```
+2. springmvc中配置文件上传
+```xml
+<!--文件上传配置-->
+<bean id="multipartResolver"  class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+    <!-- 请求的编码格式，必须和jSP的pageEncoding属性一致，以便正确读取表单的内容，默认为ISO-8859-1 -->
+    <property name="defaultEncoding" value="utf-8"/>
+    <!-- 上传文件大小上限，单位为字节（10485760=10M） -->
+    <property name="maxUploadSize" value="10485760"/>
+    <property name="maxInMemorySize" value="40960"/>
+</bean>
+```
+3. 编写controller
+```java
+@RequestMapping("/upload")
+public String fileUpload(@RequestParam("file") CommonsMultipartFile file , HttpServletRequest request) throws IOException {
+
+    //获取文件名 : file.getOriginalFilename();
+    String uploadFileName = file.getOriginalFilename();
+
+    //如果文件名为空，直接回到首页！
+    if ("".equals(uploadFileName)){
+        return "redirect:/index.jsp";
+    }
+    System.out.println("上传文件名 : "+uploadFileName);
+
+    //上传路径保存设置
+    String path = request.getServletContext().getRealPath("/upload");
+    //如果路径不存在，创建一个
+    File realPath = new File(path);
+    if (!realPath.exists()){
+        realPath.mkdir();
+    }
+    System.out.println("上传文件保存地址："+realPath);
+
+    InputStream is = file.getInputStream(); //文件输入流
+    OutputStream os = new FileOutputStream(new File(realPath,uploadFileName)); //文件输出流
+
+    //读取写出
+    int len=0;
+    byte[] buffer = new byte[1024];
+    while ((len=is.read(buffer))!=-1){
+        os.write(buffer,0,len);
+        os.flush();
+    }
+    os.close();
+    is.close();
+    return "redirect:/index.jsp";
+}
+
+@RequestMapping("/upload2")
+public String  fileUpload2(@RequestParam("file") CommonsMultipartFile file, HttpServletRequest request) throws IOException {
+
+    //上传路径保存设置
+    String path = request.getServletContext().getRealPath("/upload");
+    File realPath = new File(path);
+    if (!realPath.exists()){
+        realPath.mkdir();
+    }
+    //上传文件地址
+    System.out.println("上传文件保存地址："+realPath);
+
+    //通过CommonsMultipartFile的方法直接写文件（注意这个时候）
+    file.transferTo(new File(realPath +"/"+ file.getOriginalFilename()));
+
+    return "redirect:/index.jsp";
+}
+```
+upload1与upload2都可以实现
