@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>iframe测试体验页面无刷新</title>
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js">
+    </script>
+    <script>
+        function go() {
+            var url = document.getElementById("url").value;
+            document.getElementById("iframe1").src=url;
+        }
+    </script>
+
+</head>
+<body>
+
+<div>
+    <p>请输入地址：</p>
+    <p>
+        <input type="text" id="url">
+        <button type="submit" onclick="go()">提交</button>
+    </p>
+</div>
+
+<div>
+    <iframe id="iframe1" style="width:100%;height: 500px"></iframe>
+</div>
+
+</body>
+</html>
