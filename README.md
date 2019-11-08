@@ -564,7 +564,7 @@ HandlerInterceptor提供了三个方法：
 - postHandler ： 在拦截方法后执行（一般用于日志）
 - afterCompletion ： 渲染后处理（一般用于日志）
 拦截器通过AOP的思想实现横切拦截请求
-!()[https://img-blog.csdnimg.cn/20190701162842270.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMzIzMjU2,size_16,color_FFFFFF,t_70]
+![](https://img-blog.csdnimg.cn/20190701162842270.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMzIzMjU2,size_16,color_FFFFFF,t_70)
 
 **例子**
 
